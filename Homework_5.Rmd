@@ -1,0 +1,116 @@
+---
+title: "Homework_5"
+author: "Al Freeman"
+date: "2/23/2022"
+output: html_document
+---
+
+Question 1 Assign to the variable n_dims a single random integer between 3 and 10
+
+
+```{r}
+n_dims <- floor(runif(1, min =3, max= 10)) #Assign a single random integer between 3 and 10 to variable n_dims 
+print(n_dims)
+my_vec <- seq(1:(n_dims^2)) #Create a vector of consecutive integers from 1 to n_dims^2
+
+
+shuffle <- sample(my_vec, size = length(my_vec), replace = FALSE) #sample function randonly reshuffles the values 
+print(shuffle)
+
+my_mat <- matrix(data = shuffle, ncol = sqrt(length(shuffle)), byrow = TRUE) #create a square matrix with these elements
+print(my_mat) 
+
+transposed_mat <- t(my_mat) #find a function in r to transpose the matrix
+print(transposed_mat) 
+#the X and Y coordinates have flipped - ie. the value in [3,4] is now in [4,3]
+
+
+#### calculate the sum and the mean of the elements in the first row and the last row ####
+first_sum <- sum(transposed_mat[1,]) #sum of first row 
+last_sum <- sum(transposed_mat[nrow(transposed_mat),])#sum of last row
+print(first_sum)
+print(last_sum)
+
+first_mean <- mean(transposed_mat[1,]) #mean first row 
+last_mean <- mean(transposed_mat[nrow(transposed_mat),])#mean last row
+print(first_mean)
+
+```
+
+
+```{r}
+
+#read about the eigen() function and use it on your matrix
+my_eigen <- eigen(my_mat)
+my_eigen
+
+#Look carefully at the elements of $values and $vectors. What kind of numbers are these?
+typeof(my_eigen$values) 
+
+typeof(my_eigen$vectors) # These are both a complex
+
+```
+
+Question 2
+
+
+```{r}
+my_matrix <- matrix(data = runif(16), ncol = 4) #a 4 x 4 matrix filled with random uniform values
+print(my_matrix)
+
+my_logical <-(0.5 > runif(100)) #a 100-element vector of TRUE or FALSE values
+print(my_logical)
+
+my_letters <- sample(letters, size =length(letters)) #a 26-element vector of all the lower-case letters in random order
+print(my_letters)
+
+list1 <- list(my_matrix, my_logical, my_letters) #Create list of the three elements
+
+
+#### create a new list, which has the element[2,2] from the matrix, the second element of the logical vector, and the second element of the letters vector ####
+new_list <- list(my_matrix[2,2], my_logical[2], my_letters[2])
+print(new_list)
+
+#use the typeof() function to confirm the underlying data types of each component in this list
+typeof(new_list[[1]]) #double
+typeof(new_list[[2]]) #logical
+typeof(new_list[[3]])#character
+
+#### combine the underlying elements from the new list into a single atomic vector with the c() function #####
+new_vector <- c(my_matrix[2,2], my_logical[2], my_letters[2])
+print(new_vector)
+
+#what is the data type of this vector
+typeof(new_vector) #new_vector is type character
+
+```
+
+Question 3
+
+```{r}
+#Create a data frame with two variables (= columns) and 26 cases (= rows)
+
+my_unis <- runif(26, min=0, max=10) #call the first variable my_unis and fill it with 26 random uniform values from 0 to 10
+print(my_unis)
+
+my_letters <- sample(LETTERS) #call the second variable my_letters and fill it with 26 capital letters in random order
+print(my_letters)
+
+my_df <- data.frame(my_unis, my_letters, stringsAsFactors = FALSE) # make df with the above variabls
+print(my_df)
+
+#### for the first variable, use a single line of code in R to select 4 random rows and replace the numerical values in those rows with NA ####
+my_df[sample(length(my_df$my_unis), replace = FALSE, size = 4),1] = NA
+print(my_df)
+
+
+na_rows <- which(is.na(my_df)) #identify which rows have the missing values
+print(na_rows)
+
+my_df_sort <- my_df[order(my_df$my_letters),] #for the second variable, sort it in alphabetical order
+print(my_df_sort)
+
+####Calculate the column mean for the first variable ####
+df_mean <- mean(my_df$my_unis, na.rm=TRUE)
+print(df_mean)
+```
