@@ -1,5 +1,5 @@
 ---
-title: "Initial Webpage Set Up"
+title: "Al Freeman Website"
 output: html_document
 ---
 
@@ -17,5 +17,5 @@ Al Freeman
 
 [Homework 4](Homework 4.html)
 
-[Homework 4](Homework_5.html)
+[Homework 5](Homework_5.html)
 
