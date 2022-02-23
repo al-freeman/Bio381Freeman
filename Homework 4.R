@@ -63,11 +63,9 @@ which(queue == "aphid")
 
 
 #Question 5
-z <- rep(1:100)
+x <- rep(1:100)
+y <- which(x %% 2 !=0 & x %% 3 !=0 &x %% 7 !=0)
+y
 
-y <- seq(1:100) %>%  filter(x %% 2 !=0 & x %% 3 !=0 &x %% 7 !=0)
+y <- seq(1:100) %>%  filter(x %% 2 !=0 & x %% 3 !=0 &x %% 7 !=0) #tidyverse isn't working with me today but I want to keep the code since I work in tidyverse 
 
-z <- Filter(function(i) { all(i %% c(2,3,7) != 0) }, seq(100))
-
-z <- 
-z          
