@@ -3,7 +3,6 @@ title: "Homework_4"
 output: html_document
 ---
 
-## R Markdown
 
 Question 1
 

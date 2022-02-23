@@ -4,6 +4,7 @@ author: "Al Freeman"
 date: "2/23/2022"
 output: html_document
 ---
+
 Question 1: I found spaces that were greater than two to keep spacing between 'First String' and "More Text' uisng /s{2}. I replaced this with a comma 
 
 ```{r}
