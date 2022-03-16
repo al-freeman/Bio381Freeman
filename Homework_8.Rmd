@@ -1,0 +1,221 @@
+---
+title: "Homework_8"
+author: "Al Freeman"
+date: '2022-03-16'
+output: html_document
+---
+
+Creating Fake Data Sets To Explore Hypotheses
+Benefit of fake datasets: can be used for grant proposals to generate expected outcomes 
+
+
+1. Think about an ongoing study in your lab (or a paper you have read in a different class), and decide on a pattern that you might expect in your experiment if a specific hypothesis were true.
+
+
+I’m looking broadly at forest stand structure and physiological responses to adaptive silviculture treatements. For this assignment I’m looking at aboveground biomass in 3 treatments (resistance, resilience, and transition) as well as an uncut control. Aboveground biomass is expected to be lower in more heavily cut treatments and highest in control. Resistance and resilience have similar cuttings so these will have similar means
+
+
+2. To start simply, assume that the data in each of your treatment groups follow a normal distribution. Specify the sample sizes, means, and variances for each group that would be reasonable if your hypothesis were true. You may need to consult some previous literature and/or an expert in the field to come up with these numbers.
+
+Treatments and control (n = 4) have 10 plots in 40 blocks (160 total). 
+Resistance (RT): unifrom thinning and few trees removed
+Resilience (RL): variable thinning and more trees removed
+Transition (TR): Gap cuts and plantings, most trees removed
+Control (CT): control, uncut
+
+Experiment began in 2016, means are based on means collected from the site for aboveground biomass along with simliar standard deviations 
+Sample size and everything included in R code below with aboveground biomass means declining as treatments increase in cutting
+
+
+3. Using the methods we have covered in class, write code to create a random dataset that has these attributes. Organize these data into a dataframe with the appropriate structure
+
+```{r}
+# all treatments have 40 plots
+# control treatment has plot mean of 150 Mg/ha, minimal variability
+CT <- rnorm(40, mean = 150, sd = 15)
+CT <- data.frame(CT, "CT")
+colnames(CT) <- c("agb_Mg", "treatment")
+# resistance treatment has lower mean, still low variability
+RT <- rnorm(40, mean = 140, sd = 20)
+RT <- data.frame(RT, "RT")
+colnames(RT) <- c("agb_Mg", "treatment")
+# resilience treatment has lower mean, and higher variability
+RL <- rnorm(40, mean = 130, sd = 35)
+RL <- data.frame(RL, "RL")
+colnames(RL) <- c("agb_Mg", "treatment")
+# transition has lowest biomass, and most variability
+TR <- rnorm(40, mean = 120, sd = 50)
+TR <- data.frame(TR, "TR")
+colnames(TR) <- c("agb_Mg", "treatment")
+id <- c(1:160)
+my_data <- rbind(CT, RT, RL, TR)
+my_data <- cbind(id, my_data)
+
+head(my_data)
+tail(my_data)
+```
+
+4. Now write code to analyze the data. Write code to generate a useful plot of the data
+
+
+
+
+```{r}
+#categorical x (treatment type) and continuous y (aboveground biomass) requires ANOVA for analysis
+
+m1 <- aov(agb_Mg ~ treatment, data = my_data)
+summary(m1)
+
+library(ggplot2)
+#ggplot(my_data, aes(x = treatment, y =agb_Mg, fill =treatment)) + geom_boxplot() #this figure works but it's producing an error when knitting regarding an error in loading png_will fix 
+#ggplot(data = my_data, aes(x = treatment, y = agb_Mg, fill = treatment)) + geom_boxplot()
+
+
+```
+
+
+5. Try running your analysis multiple times to get a feeling for how variable the results are within the same parameters, but different sets of random numbers
+
+
+```{r}
+#Go back and run data to visualize how variable the random numbers may be
+#results are not incredibly variable, all means fall in similar range 5/5 times
+
+```
+
+6. Now begin adjusting the means of the different groups. Given the sample sizes you have chosen, how small can the differences between the groups be (the “effect size”) for you to still detect a significant pattern (p < 0.05)
+
+```{r}
+# Converging on mean of 155
+CT <- rnorm(40, mean = 170, sd = 15)
+CT <- data.frame(CT, "CT")
+colnames(CT) <- c("agb_Mg", "treatment")
+RT <- rnorm(40, mean = 155, sd = 20)
+RT <- data.frame(RT, "RT")
+colnames(RT) <- c("agb_Mg", "treatment")
+RL <- rnorm(40, mean = 155, sd = 35)
+RL <- data.frame(RL, "RL")
+colnames(RL) <- c("agb_Mg", "treatment")
+TR <- rnorm(40, mean = 140, sd = 50)
+TR <- data.frame(TR, "TR")
+colnames(TR) <- c("agb_Mg", "treatment")
+id <- c(1:160)
+my_data <- rbind(CT, RT, RL, TR)
+my_data <- cbind(id, my_data)
+m1 <- aov(agb_Mg ~ treatment, data = my_data)
+summary(m1)
+#19/20 times, results are signficant
+```
+
+
+
+```{r}
+# Converging on mean of 155 (range of 5)
+CT <- rnorm(40, mean = 160, sd = 15)
+CT <- data.frame(CT, "CT")
+colnames(CT) <- c("agb_Mg", "treatment")
+RT <- rnorm(40, mean = 155, sd = 20)
+RT <- data.frame(RT, "RT")
+colnames(RT) <- c("agb_Mg", "treatment")
+RL <- rnorm(40, mean = 155, sd = 35)
+RL <- data.frame(RL, "RL")
+colnames(RL) <- c("agb_Mg", "treatment")
+TR <- rnorm(40, mean = 145, sd = 50)
+TR <- data.frame(TR, "TR")
+colnames(TR) <- c("agb_Mg", "treatment")
+id <- c(1:160)
+my_data <- rbind(CT, RT, RL, TR)
+my_data <- cbind(id, my_data)
+m1 <- aov(agb_Mg ~ treatment, data = my_data)
+summary(m1)
+
+#difference is too small to detect for this session, 1/5 times generated significant results
+#
+
+####Difference of 15 between groups is ideal for generating significant results 
+```
+
+7. Alternatively, for the effect sizes you originally hypothesized, what is the minimum sample size you would need in order to detect a statistically significant effect?
+
+
+
+```{r}
+# drop down to sample size of 30
+CT <- rnorm(30, mean = 170, sd = 15)
+CT <- data.frame(CT, "CT")
+colnames(CT) <- c("agb_Mg", "treatment")
+RT <- rnorm(30, mean = 155, sd = 20)
+RT <- data.frame(RT, "RT")
+colnames(RT) <- c("agb_Mg", "treatment")
+RL <- rnorm(30, mean = 155, sd = 35)
+RL <- data.frame(RL, "RL")
+colnames(RL) <- c("agb_Mg", "treatment")
+TR <- rnorm(30, mean = 140, sd = 50)
+TR <- data.frame(TR, "TR")
+colnames(TR) <- c("agb_Mg", "treatment")
+id <- c(1:120)
+my_data <- rbind(CT, RT, RL, TR)
+my_data <- cbind(id, my_data)
+m1 <- aov(agb_Mg ~ treatment, data = my_data)
+summary(m1)
+
+#Significant 9/10 tries
+
+```
+
+
+
+
+```{r}
+
+# drop down to sample size of 20
+CT <- rnorm(20, mean = 170, sd = 15)
+CT <- data.frame(CT, "CT")
+colnames(CT) <- c("agb_Mg", "treatment")
+RT <- rnorm(20, mean = 155, sd = 20)
+RT <- data.frame(RT, "RT")
+colnames(RT) <- c("agb_Mg", "treatment")
+RL <- rnorm(20, mean = 155, sd = 35)
+RL <- data.frame(RL, "RL")
+colnames(RL) <- c("agb_Mg", "treatment")
+TR <- rnorm(20, mean = 140, sd = 50)
+TR <- data.frame(TR, "TR")
+colnames(TR) <- c("agb_Mg", "treatment")
+id <- c(1:80)
+my_data <- rbind(CT, RT, RL, TR)
+my_data <- cbind(id, my_data)
+m1 <- aov(agb_Mg ~ treatment, data = my_data)
+summary(m1)
+
+
+#signficant 8/10
+
+
+```
+
+
+
+```{r}
+# drop down to sample size of 10
+CT <- rnorm(10, mean = 170, sd = 15)
+CT <- data.frame(CT, "CT")
+colnames(CT) <- c("agb_Mg", "treatment")
+RT <- rnorm(10, mean = 155, sd = 20)
+RT <- data.frame(RT, "RT")
+colnames(RT) <- c("agb_Mg", "treatment")
+RL <- rnorm(10, mean = 155, sd = 35)
+RL <- data.frame(RL, "RL")
+colnames(RL) <- c("agb_Mg", "treatment")
+TR <- rnorm(10, mean = 140, sd = 50)
+TR <- data.frame(TR, "TR")
+colnames(TR) <- c("agb_Mg", "treatment")
+id <- c(1:40)
+my_data <- rbind(CT, RT, RL, TR)
+my_data <- cbind(id, my_data)
+m1 <- aov(agb_Mg ~ treatment, data = my_data)
+summary(m1)
+
+#significant 3/10 times
+#
+#minimum sample size of 20 for this particular dataset 
+```

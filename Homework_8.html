@@ -9,9 +9,11 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
+<meta name="author" content="Al Freeman" />
 
+<meta name="date" content="2022-03-16" />
 
-<title>Al Freeman Website</title>
+<title>Homework_8</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -361,19 +363,241 @@ pre code {
 
 
 
-<h1 class="title toc-ignore">Al Freeman Website</h1>
+<h1 class="title toc-ignore">Homework_8</h1>
+<h4 class="author">Al Freeman</h4>
+<h4 class="date">2022-03-16</h4>
 
 </div>
 
 
-<p>Home Page Al Freeman</p>
-<p><a href="newpage.html">Homework 2</a></p>
-<p><a href="Homework_3.html">Homework 3</a></p>
-<p><a href="Homework_4.html">Homework 4</a></p>
-<p><a href="Homework_5.html">Homework 5</a></p>
-<p><a href="Homework_6.html">Homework 6</a></p>
-<p><a href="Homework_7.html">Homework 7</a></p>
-<p><a href="Homework_8.html">Homework 8</a></p>
+<p>Creating Fake Data Sets To Explore Hypotheses Benefit of fake
+datasets: can be used for grant proposals to generate expected
+outcomes</p>
+<ol style="list-style-type: decimal">
+<li>Think about an ongoing study in your lab (or a paper you have read
+in a different class), and decide on a pattern that you might expect in
+your experiment if a specific hypothesis were true.</li>
+</ol>
+<p>I’m looking broadly at forest stand structure and physiological
+responses to adaptive silviculture treatements. For this assignment I’m
+looking at aboveground biomass in 3 treatments (resistance, resilience,
+and transition) as well as an uncut control. Aboveground biomass is
+expected to be lower in more heavily cut treatments and highest in
+control. Resistance and resilience have similar cuttings so these will
+have similar means</p>
+<ol start="2" style="list-style-type: decimal">
+<li>To start simply, assume that the data in each of your treatment
+groups follow a normal distribution. Specify the sample sizes, means,
+and variances for each group that would be reasonable if your hypothesis
+were true. You may need to consult some previous literature and/or an
+expert in the field to come up with these numbers.</li>
+</ol>
+<p>Treatments and control (n = 4) have 10 plots in 40 blocks (160
+total). Resistance (RT): unifrom thinning and few trees removed
+Resilience (RL): variable thinning and more trees removed Transition
+(TR): Gap cuts and plantings, most trees removed Control (CT): control,
+uncut</p>
+<p>Experiment began in 2016, means are based on means collected from the
+site for aboveground biomass along with simliar standard deviations
+Sample size and everything included in R code below with aboveground
+biomass means declining as treatments increase in cutting</p>
+<ol start="3" style="list-style-type: decimal">
+<li>Using the methods we have covered in class, write code to create a
+random dataset that has these attributes. Organize these data into a
+dataframe with the appropriate structure</li>
+</ol>
+<pre class="r"><code># all treatments have 40 plots
+# control treatment has plot mean of 150 Mg/ha, minimal variability
+CT &lt;- rnorm(40, mean = 150, sd = 15)
+CT &lt;- data.frame(CT, &quot;CT&quot;)
+colnames(CT) &lt;- c(&quot;agb_Mg&quot;, &quot;treatment&quot;)
+# resistance treatment has lower mean, still low variability
+RT &lt;- rnorm(40, mean = 140, sd = 20)
+RT &lt;- data.frame(RT, &quot;RT&quot;)
+colnames(RT) &lt;- c(&quot;agb_Mg&quot;, &quot;treatment&quot;)
+# resilience treatment has lower mean, and higher variability
+RL &lt;- rnorm(40, mean = 130, sd = 35)
+RL &lt;- data.frame(RL, &quot;RL&quot;)
+colnames(RL) &lt;- c(&quot;agb_Mg&quot;, &quot;treatment&quot;)
+# transition has lowest biomass, and most variability
+TR &lt;- rnorm(40, mean = 120, sd = 50)
+TR &lt;- data.frame(TR, &quot;TR&quot;)
+colnames(TR) &lt;- c(&quot;agb_Mg&quot;, &quot;treatment&quot;)
+id &lt;- c(1:160)
+my_data &lt;- rbind(CT, RT, RL, TR)
+my_data &lt;- cbind(id, my_data)
+
+head(my_data)</code></pre>
+<pre><code>##   id   agb_Mg treatment
+## 1  1 162.2274        CT
+## 2  2 156.2427        CT
+## 3  3 129.4865        CT
+## 4  4 147.5943        CT
+## 5  5 160.3571        CT
+## 6  6 147.2376        CT</code></pre>
+<pre class="r"><code>tail(my_data)</code></pre>
+<pre><code>##      id    agb_Mg treatment
+## 155 155 216.73820        TR
+## 156 156 136.81583        TR
+## 157 157  94.67706        TR
+## 158 158  53.51138        TR
+## 159 159 145.95982        TR
+## 160 160 125.28147        TR</code></pre>
+<ol start="4" style="list-style-type: decimal">
+<li>Now write code to analyze the data. Write code to generate a useful
+plot of the data</li>
+</ol>
+<pre class="r"><code>#categorical x (treatment type) and continuous y (aboveground biomass) requires ANOVA for analysis
+
+m1 &lt;- aov(agb_Mg ~ treatment, data = my_data)
+summary(m1)</code></pre>
+<pre><code>##              Df Sum Sq Mean Sq F value Pr(&gt;F)
+## treatment     3   6175  2058.4   2.101  0.102
+## Residuals   156 152820   979.6</code></pre>
+<pre class="r"><code>library(ggplot2)
+#ggplot(my_data, aes(x = treatment, y =agb_Mg, fill =treatment)) + geom_boxplot() #this figure works but it&#39;s producing an error when knitting regarding an error in loading png_will fix 
+#ggplot(data = my_data, aes(x = treatment, y = agb_Mg, fill = treatment)) + geom_boxplot()</code></pre>
+<ol start="5" style="list-style-type: decimal">
+<li>Try running your analysis multiple times to get a feeling for how
+variable the results are within the same parameters, but different sets
+of random numbers</li>
+</ol>
+<pre class="r"><code>#Go back and run data to visualize how variable the random numbers may be
+#results are not incredibly variable, all means fall in similar range 5/5 times</code></pre>
+<ol start="6" style="list-style-type: decimal">
+<li>Now begin adjusting the means of the different groups. Given the
+sample sizes you have chosen, how small can the differences between the
+groups be (the “effect size”) for you to still detect a significant
+pattern (p &lt; 0.05)</li>
+</ol>
+<pre class="r"><code># Converging on mean of 155
+CT &lt;- rnorm(40, mean = 170, sd = 15)
+CT &lt;- data.frame(CT, &quot;CT&quot;)
+colnames(CT) &lt;- c(&quot;agb_Mg&quot;, &quot;treatment&quot;)
+RT &lt;- rnorm(40, mean = 155, sd = 20)
+RT &lt;- data.frame(RT, &quot;RT&quot;)
+colnames(RT) &lt;- c(&quot;agb_Mg&quot;, &quot;treatment&quot;)
+RL &lt;- rnorm(40, mean = 155, sd = 35)
+RL &lt;- data.frame(RL, &quot;RL&quot;)
+colnames(RL) &lt;- c(&quot;agb_Mg&quot;, &quot;treatment&quot;)
+TR &lt;- rnorm(40, mean = 140, sd = 50)
+TR &lt;- data.frame(TR, &quot;TR&quot;)
+colnames(TR) &lt;- c(&quot;agb_Mg&quot;, &quot;treatment&quot;)
+id &lt;- c(1:160)
+my_data &lt;- rbind(CT, RT, RL, TR)
+my_data &lt;- cbind(id, my_data)
+m1 &lt;- aov(agb_Mg ~ treatment, data = my_data)
+summary(m1)</code></pre>
+<pre><code>##              Df Sum Sq Mean Sq F value   Pr(&gt;F)    
+## treatment     3  25432    8477   7.669 8.18e-05 ***
+## Residuals   156 172449    1105                     
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>#19/20 times, results are signficant</code></pre>
+<pre class="r"><code># Converging on mean of 155 (range of 5)
+CT &lt;- rnorm(40, mean = 160, sd = 15)
+CT &lt;- data.frame(CT, &quot;CT&quot;)
+colnames(CT) &lt;- c(&quot;agb_Mg&quot;, &quot;treatment&quot;)
+RT &lt;- rnorm(40, mean = 155, sd = 20)
+RT &lt;- data.frame(RT, &quot;RT&quot;)
+colnames(RT) &lt;- c(&quot;agb_Mg&quot;, &quot;treatment&quot;)
+RL &lt;- rnorm(40, mean = 155, sd = 35)
+RL &lt;- data.frame(RL, &quot;RL&quot;)
+colnames(RL) &lt;- c(&quot;agb_Mg&quot;, &quot;treatment&quot;)
+TR &lt;- rnorm(40, mean = 145, sd = 50)
+TR &lt;- data.frame(TR, &quot;TR&quot;)
+colnames(TR) &lt;- c(&quot;agb_Mg&quot;, &quot;treatment&quot;)
+id &lt;- c(1:160)
+my_data &lt;- rbind(CT, RT, RL, TR)
+my_data &lt;- cbind(id, my_data)
+m1 &lt;- aov(agb_Mg ~ treatment, data = my_data)
+summary(m1)</code></pre>
+<pre><code>##              Df Sum Sq Mean Sq F value Pr(&gt;F)
+## treatment     3   6107    2036   1.953  0.123
+## Residuals   156 162574    1042</code></pre>
+<pre class="r"><code>#difference is too small to detect for this session, 1/5 times generated significant results
+#
+
+####Difference of 15 between groups is ideal for generating significant results </code></pre>
+<ol start="7" style="list-style-type: decimal">
+<li>Alternatively, for the effect sizes you originally hypothesized,
+what is the minimum sample size you would need in order to detect a
+statistically significant effect?</li>
+</ol>
+<pre class="r"><code># drop down to sample size of 30
+CT &lt;- rnorm(30, mean = 170, sd = 15)
+CT &lt;- data.frame(CT, &quot;CT&quot;)
+colnames(CT) &lt;- c(&quot;agb_Mg&quot;, &quot;treatment&quot;)
+RT &lt;- rnorm(30, mean = 155, sd = 20)
+RT &lt;- data.frame(RT, &quot;RT&quot;)
+colnames(RT) &lt;- c(&quot;agb_Mg&quot;, &quot;treatment&quot;)
+RL &lt;- rnorm(30, mean = 155, sd = 35)
+RL &lt;- data.frame(RL, &quot;RL&quot;)
+colnames(RL) &lt;- c(&quot;agb_Mg&quot;, &quot;treatment&quot;)
+TR &lt;- rnorm(30, mean = 140, sd = 50)
+TR &lt;- data.frame(TR, &quot;TR&quot;)
+colnames(TR) &lt;- c(&quot;agb_Mg&quot;, &quot;treatment&quot;)
+id &lt;- c(1:120)
+my_data &lt;- rbind(CT, RT, RL, TR)
+my_data &lt;- cbind(id, my_data)
+m1 &lt;- aov(agb_Mg ~ treatment, data = my_data)
+summary(m1)</code></pre>
+<pre><code>##              Df Sum Sq Mean Sq F value  Pr(&gt;F)   
+## treatment     3  17359    5786   4.685 0.00399 **
+## Residuals   116 143267    1235                   
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>#Significant 9/10 tries</code></pre>
+<pre class="r"><code># drop down to sample size of 20
+CT &lt;- rnorm(20, mean = 170, sd = 15)
+CT &lt;- data.frame(CT, &quot;CT&quot;)
+colnames(CT) &lt;- c(&quot;agb_Mg&quot;, &quot;treatment&quot;)
+RT &lt;- rnorm(20, mean = 155, sd = 20)
+RT &lt;- data.frame(RT, &quot;RT&quot;)
+colnames(RT) &lt;- c(&quot;agb_Mg&quot;, &quot;treatment&quot;)
+RL &lt;- rnorm(20, mean = 155, sd = 35)
+RL &lt;- data.frame(RL, &quot;RL&quot;)
+colnames(RL) &lt;- c(&quot;agb_Mg&quot;, &quot;treatment&quot;)
+TR &lt;- rnorm(20, mean = 140, sd = 50)
+TR &lt;- data.frame(TR, &quot;TR&quot;)
+colnames(TR) &lt;- c(&quot;agb_Mg&quot;, &quot;treatment&quot;)
+id &lt;- c(1:80)
+my_data &lt;- rbind(CT, RT, RL, TR)
+my_data &lt;- cbind(id, my_data)
+m1 &lt;- aov(agb_Mg ~ treatment, data = my_data)
+summary(m1)</code></pre>
+<pre><code>##             Df Sum Sq Mean Sq F value  Pr(&gt;F)   
+## treatment    3  15777    5259   4.107 0.00934 **
+## Residuals   76  97325    1281                   
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>#signficant 8/10</code></pre>
+<pre class="r"><code># drop down to sample size of 10
+CT &lt;- rnorm(10, mean = 170, sd = 15)
+CT &lt;- data.frame(CT, &quot;CT&quot;)
+colnames(CT) &lt;- c(&quot;agb_Mg&quot;, &quot;treatment&quot;)
+RT &lt;- rnorm(10, mean = 155, sd = 20)
+RT &lt;- data.frame(RT, &quot;RT&quot;)
+colnames(RT) &lt;- c(&quot;agb_Mg&quot;, &quot;treatment&quot;)
+RL &lt;- rnorm(10, mean = 155, sd = 35)
+RL &lt;- data.frame(RL, &quot;RL&quot;)
+colnames(RL) &lt;- c(&quot;agb_Mg&quot;, &quot;treatment&quot;)
+TR &lt;- rnorm(10, mean = 140, sd = 50)
+TR &lt;- data.frame(TR, &quot;TR&quot;)
+colnames(TR) &lt;- c(&quot;agb_Mg&quot;, &quot;treatment&quot;)
+id &lt;- c(1:40)
+my_data &lt;- rbind(CT, RT, RL, TR)
+my_data &lt;- cbind(id, my_data)
+m1 &lt;- aov(agb_Mg ~ treatment, data = my_data)
+summary(m1)</code></pre>
+<pre><code>##             Df Sum Sq Mean Sq F value Pr(&gt;F)  
+## treatment    3  11023    3674   3.085 0.0394 *
+## Residuals   36  42879    1191                 
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>#significant 3/10 times
+#
+#minimum sample size of 20 for this particular dataset </code></pre>
 
 
 
