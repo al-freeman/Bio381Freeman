@@ -1,0 +1,224 @@
+---
+title: "Homework_9"
+author: "Al Freeman"
+date: '2022-04-06'
+output: html_document
+---
+
+Organizing Code With Structured Programming
+
+Use the code that you worked on in Homework #8 (creating fake data sets) , and re-organize it following the principles of structured programming. Do all the work in a single chunk in your R markdown file, just as if you were writing a single R script. Start with all of your annotated functions, preliminary calls, and global variables. The program body should be only a few lines of code that call the appropriate functions and run them in the correct order. Make sure that the output from one function serves as the input to the next. You can either daisy-chain the functions or write separate lines of code to hold elements in temporary variables and pass the along.
+
+
+```{r}
+#-------------
+# FUNCTION get_data
+# description: read in csv file
+# inputs: csv file
+# outputs: dataframe
+###################################
+library(ggplot2)
+library(ggforce)
+get_data <- function(file_name = NULL){
+  
+  if(is.null(file_name)){
+    df <- data.frame(ID = 101:110, 
+                     var_a = runif(10),
+                     var_b = runif(10))
+  } else {
+    df <- read.table(file = file_name,
+                     header = TRUE,
+                     sep = ",",
+                     stringsAsFactors = FALSE)
+  }
+  
+  return(df)
+} # end of get_data
+#--------------------------------
+# -------------------------------
+# FUNCTION calculate
+# description: fits an ANOVA model
+# inputs: x and y vectors of numeric; must be the same length
+# outputs: entire model summary from aov
+###################################
+calculations <- function(x_var = runif(10),
+                            y_var = runif(10)){
+  
+  df <- data.frame(x_var, y_var)
+  aov_model <- aov(y_var ~ x_var, data = df)
+  
+  
+  return(summary(aov_model))
+  
+} # end of calculate
+#--------------------------------
+# -------------------------------
+# FUNCTION summarize_output
+# description: pull elements from model summary list
+# inputs: list from summary call of anova
+# outputs: vector of regression residuals
+###################################
+summarize_output <- function(z = NULL){
+  
+  if(is.null(z)) {
+    z <- summary(lm(runif(10) ~ runif(10)))
+  }
+  
+  return(z[[1]][[5]][1])
+  
+} # end of summarize_output
+#--------------------------------
+# -------------------------------
+# FUNCTION graph_results
+# description: graph data and fitted OLS line
+# inputs: x and y vectors of numeric. Must be same length.
+# outputs: creates graph
+###################################
+graph_results <- function(x_var = runif(10),
+                          y_var = runif(10)){
+  
+  df <- data.frame(x_var, y_var)
+  p1 <- qplot(data = df, 
+              x = x_var, 
+              y = y_var,
+              geom = c("boxplot"),
+              fill = x_var)
+  print(p1)
+  message("Message: Boxplot created!")
+  
+  
+} # end of graph_results
+#----------------------------------
+
+
+
+```
+
+Structured programming script
+
+
+```{r}
+# ------------------------------
+# Structured programming for data simulation
+# 
+# ------------------------------
+#
+
+# load packages ------------------------------
+library(ggplot2)
+
+# source files ------------------------------
+# source(myFunctions.R)
+# for the purpose of this exercise functions appear above
+
+# Global Variables ------------------------------
+treedata <- read.csv("./Photosynthesis/Survey_Measurements_8.16.21.csv")
+head(treedata)
+xcol <- 4 # column 4 is species
+ycol <- 9 # column 9 is Amax
+
+# Program body ------------------------------
+x <- treedata[,xcol] # predictor variable
+y <- treedata[,ycol] # response variable
+
+x1 <- calculations(x_var = x, y_var = y)
+print(x1)
+
+x2 <- summarize_output(x1)
+print(x2)
+
+graph_results(x_var = x, y_var = y)
+
+
+```
+Once your code is up and working, modify your program to do something else: record a new summary variable, code a new statistical analysis, or create a different set of random variables or output graph. Do not rewrite any of your existing functions. Instead, copy them, rename them, and then modify them to do new things. Once your new functions are written, add some more lines of program code, calling a mixture of your previous functions and your new functions to get the job done.
+
+```{r}
+# New Functions ------------------------------
+
+
+# -------------------------------
+# FUNCTION summarize_output2
+# description: show treatment differences from anova
+# inputs: list from summary call of anova
+# outputs: contrast table
+###################################
+summarize_output2 <- function(x_var = runif(10), y_var = runif(10)){
+  
+  df <- data.frame(x_var, y_var)
+  cont <- summary.lm(aov(y_var ~ x_var, data = df))
+  
+  return(cont[4])
+  
+} # end of summarize_output2
+#--------------------------------
+
+# -------------------------------
+# FUNCTION graph_results2
+# description: graph data 
+# inputs: x and y vectors of numeric. Must be same length.
+# outputs: creates graph
+###################################
+graph_results2 <- function(x_var = runif(10),
+                          y_var = runif(10)){
+  
+  df <- data.frame(x_var, y_var)
+  p1 <- ggplot(data = df, aes(x = x_var, y = y_var, color = x_var)) + 
+              geom_bar() 
+
+  print(p1)
+  message("Message: Sinaplot created!")
+  
+  
+} # end of graph_results
+#----------------------------------
+```
+
+```{r}
+# ------------------------------
+# Structured programming 2
+# 
+# ------------------------------
+#
+
+# load packages ------------------------------
+library(ggplot2)
+library(ggforce)
+
+# source files ------------------------------
+# source(myFunctions.R)
+# for the purpose of this exercise functions appear above
+
+
+# Global Variables ------------------------------
+treedata <- read.csv("./Photosynthesis/Survey_Measurements_8.16.21.csv")
+head(treedata)
+xcol <- 4 # column 4 is species
+ycol <- 9 # column 9 is Amax
+
+# Program body ------------------------------
+x <- treedata[,xcol] # predictor variable
+y <- treedata[,ycol] # response variable
+
+x1 <- calculations(x_var = x, y_var = y)
+print(x1)
+
+x2 <- summarize_output(x1)
+print(x2)
+
+graph_results(x_var = x, y_var = y)
+
+# anova summary
+x3 <- calculations(x_var = x, y_var = y)
+print(x3)
+
+# p-value
+x4 <- summarize_output(x3)
+print(x4)
+
+# contrast - Which treatments are different than control?
+x5 <- summarize_output2(x_var = x, y_var = y)
+print(x5)
+
+
+```

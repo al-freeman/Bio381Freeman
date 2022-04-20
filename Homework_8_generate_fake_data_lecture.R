@@ -85,3 +85,15 @@ hist(abund3)
 #Option 1: get probability from beta distribution
 probs <- rbeta(n = 20, shape = 1, shape2 =1)
 occ1 <- rbinom(n = 20, size = 1, prob = probs)
+print(occ1)
+
+
+#Option 2: occupancy with a covariate, similar to above expcet we are genrating probs, not lambdas
+pre.probs <- beta0 + beta1*x #regression from earlier
+#convert to 0-1 scale
+psi <- inv.logit(pre.probs)#puts numbers on 0-1 scale
+
+
+#create new occupancy data:
+occ2 <- rbinom(n = 20, size = 1, prob = psi)
+print(occ2)

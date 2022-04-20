@@ -1,0 +1,158 @@
+---
+title: "Homework_10"
+author: "Al Freeman"
+date: '2022-04-06'
+output: html_document
+---
+
+For loops and randomization tests
+Using a forloop, write a function to calculate the number of zeroes in a numeric vector. Before entering the loop, set up a counter variable counter <- 0. Inside the loop, add 1 to counter each time you have a zero in the matrix. Finally, use return(counter) for the output.
+
+```{r}
+
+library(tidyverse)
+# create a numeric vector containing some 0's
+my_vec <- rpois(100, lambda = 2)
+
+# -------------------------------
+# FUNCTION count_zeros
+# description: counts number of zeros in numeric vector
+# inputs: numeric vector
+# outputs: number of zeros in vector
+###################################
+count_zeros <- function(vec = rnorm(n = 10, mean = 0, sd = 1)){
+
+# counter variable 0
+counter <- 0
+
+  for(i in seq_along(vec)){
+  if(vec[i] == 0){
+    counter <- counter + 1
+  }
+
+}
+
+  return(counter)
+} # end of count_zeros
+#--------------------------------
+
+# test 1
+count_zeros()
+## [1] 0
+# test 2
+count_zeros(vec = my_vec)
+## [1] 12
+
+```
+
+Use subsetting instead of a loop to rewrite the function as a single line of code.
+
+```{r}
+length(my_vec[my_vec == 0])
+
+```
+Write a function that takes as input two integers representing the number of rows and columns in a matrix. The output is a matrix of these dimensions in which each element is the product of the row number x the column number.
+
+
+```{r}
+# -------------------------------
+# FUNCTION matrix_fun
+# description: creates a matrix of certain dimensions where each element is the product of row * column number
+# inputs: two integers (row and column)
+# outputs: matrix
+###################################
+matrix_fun <- function(x  = 2, y = 3){
+
+mat1 <- matrix(nrow = x, ncol = y)
+
+for(i in 1:nrow(mat1)){
+  for(j in 1:ncol(mat1)){
+    mat1[i,j] <- i * j
+  }
+}
+
+return(mat1)
+
+} # end of matrix_fun
+#--------------------------------
+
+# test function
+matrix_fun()
+##      [,1] [,2] [,3]
+## [1,]    1    2    3
+## [2,]    2    4    6
+# test with different values
+matrix_fun(x = 3, y = 5)
+
+
+```
+In the next few lectures, you will learn how to do a randomization test on your data. We will complete some of the steps today to practice calling custom functions within a for loop. Use the code from the March 31st lecture (Randomization Tests) to complete the following steps:
+
+Simulate a dataset with 3 groups of data, each group drawn from a distribution with a different mean. The final data frame should have 1 column for group and 1 column for the response variable.
+
+
+
+```{r}
+group <- as.factor(c(rep("A", 30), rep("B", 30), rep("C", 30))) #make group vector
+A <- rnorm(n = 30, mean = 22, sd= 2.5) #make corresponding data for group A
+B <- rnorm(n = 30, mean = 180, sd = 3)#make corresponding data for group B
+C <- rnorm(n = 30, mean = 100, sd = 1)#make corresponding data for group C
+response <- c(A, B, C) #combine data into one vector for the responses
+newdf <- data.frame(group, response) # combine response vector and groups into a data frame
+head(newdf)
+```
+
+Write a custom function that 1) reshuffles the response variable, and 2) calculates the mean of each group in the reshuffled data. Store the means in a vector of length 3.
+
+```{r}
+reshuffle <- function(df = newdf) {
+  colnames(df) <- c("group", "response")
+  df$response <- sample(df$response, length(df$response), replace = FALSE)
+
+    df2 <- df %>%
+     group_by(group) %>%
+     summarize(mean = mean(response))
+    return(as.vector(df2$mean))
+}
+reshuffle()
+
+
+```
+
+Use a for loop to repeat the function in b 100 times. Store the results in a data frame that has 1 column indicating the replicate number and 1 column for each new group mean, for a total of 4 columns.
+
+
+```{r}
+#create empty vectors to fill in for loop
+rep <- rep(NULL, 100)
+grp_meanA <- rep(NULL, 100)
+grp_meanB <- rep(NULL, 100)
+grp_meanC <- rep(NULL, 100)
+df <- data.frame(rep, grp_meanA, grp_meanB, grp_meanC)
+
+#For loop to reshuffle data 100 times and save output as a dataframe-print dataframe to chekc there are 4 columns 
+for (i in 1:100) {
+  df[i,1] <- i
+  for (j in 1:3) {
+  df_reshuff <- data.frame(c(A, B, C), reshuffle())
+  df[i,j+1] <- df_reshuff[j,2]
+  
+  } # end j for loop
+} #end i for loop
+colnames(df) <- c("rep", "grp_meanA", "grp_meanB", "grp_meanC")
+head(df)#four columns 
+
+```
+
+Use qplot() to create a histogram of the means for each reshuffled group. Or, if you want a challenge, use ggplot() to overlay all 3 histograms in the same figure. How do the distributions of reshuffled means compare to the original means?
+
+```{r}
+df_all <- df %>%
+  pivot_longer(cols = grp_meanA:grp_meanC, names_to = "group", values_to = "Values")
+
+ggplot(df_all, aes(x=Values)) + geom_histogram() + facet_wrap(~group)
+
+#the original had higher counts for the means
+
+
+```
